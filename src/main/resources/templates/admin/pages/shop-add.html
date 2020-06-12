@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <script src="js/jquery-3.3.1.js"></script>
+    <style>
+        select option:hover {
+            background-color: rgb(95, 184, 120);
+        }
+        .parentCategory,.childrenCategory{
+            float: left;
+            margin-bottom: 13px;
+        }
+        #add_deal{
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div id="add_deal">
+    <form id="add-shop"  class="layui-form1">
+        <div class="layui-form-item">
+            <label class="layui-form-label">店铺名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="shopName" lay-verify="title" autocomplete="off" placeholder=""
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">负责人</label>
+            <div class="layui-input-block">
+                <input type="text" name="shopManager" lay-verify="title" autocomplete="off" placeholder=""
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">电话</label>
+            <div class="layui-input-block">
+                <input type="text" name="tel" lay-verify="title" autocomplete="off" placeholder=""
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">身份证号</label>
+            <div class="layui-input-block">
+                <input type="text" name="idCart" lay-verify="title" autocomplete="off" placeholder=""
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">简介</label>
+            <div class="layui-input-block">
+                <input type="text" name="subTitle" lay-verify="title" autocomplete="off" placeholder=""
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">详情</label>
+            <div class="layui-input-block">
+                <input type="text" name="detail" lay-verify="title" autocomplete="off" placeholder=""
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">邮箱</label>
+            <div class="layui-input-block">
+                <input type="text" name="email" lay-verify="title" autocomplete="off" placeholder=""
+                       class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="address" lay-verify="title" autocomplete="off" placeholder=""
+                       class="layui-input">
+            </div>
+        </div>
+
+
+        <div>
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+                <legend>附图</legend>
+            </fieldset>
+            <div class="layui-upload">
+                <button type="button" class="layui-btn" id="shop-upload" style="margin-left: 20px">图片上传</button>
+                <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+                    预览图：
+                    <div class="layui-upload-list" id="demo2">
+                    </div>
+                </blockquote>
+            </div>
+
+        </div>
+
+        <div style="margin-left: 95%">
+            <a class="layui-btn" onclick="sub()">提交</a>
+        </div>
+    </form>
+</div>
+<script src="layui/layui.js" charset="utf-8"></script>
+<script>
+
+    function sub() {
+
+        $.ajax({
+            url:"/manage/shop/add_shop",
+            type:"post",
+            data:$('#add-shop').serialize(),
+            success:function (data) {
+                console.log(data)
+                if(data.msg === "SUCCESS"){
+                    layer.msg(data.msg, {icon: 6});
+                    $("input").val("")
+                   $("#demo2").children().remove()
+                   $("#demo3").children().remove()
+                }else {
+                    layer.msg(data.msg, {icon: 5});
+                }
+            }
+        })
+    }
+
+
+
+    layui.use(['table', 'element', 'layer', 'jquery', 'form', 'upload'], function () {
+        //var $ = layui.jquery
+        var element = layui.element
+        var layer = layui.layer
+        var form = layui.form;
+        var table = layui.table;
+        var upload = layui.upload
+        //多图片上传
+        upload.render({
+            elem: '#shop-upload'
+            , url: '/manage/file/upload'
+            , multiple: false
+            , field: "upImg"
+            , method: "post"
+            , before: function (obj) {
+                //预读本地文件示例，不支持ie8
+                obj.preview(function (index, file, result) {
+                     // $('#demo2').append('<img src="'+ result +'" style="width: 250;height: 250px" alt="'+ file.name +'" class="layui-upload-img">')
+                });
+            }
+            , done: function (res) {
+                var path = encodeURIComponent(res.data.path)
+                $("#demo2").append("<input type='hidden' name='image' value="+path+"/>")
+                //上传完毕
+                $('#demo2').append('<img src="/manage/file/file_download?path=' + path + '" alt="" style="width: 250px;height: 250px" class="layui-upload-img">')
+            }
+        });
+        form.render("select");
+    });
+</script>
+</body>
+</html>

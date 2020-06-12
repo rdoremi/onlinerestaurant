@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjh.online.restaurant.mapper.ProductMapper">
+    <resultMap id="BaseResultMap" type="com.cjh.online.restaurant.entity.Product">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="merchant_id" jdbcType="VARCHAR" property="merchantId"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="price" jdbcType="REAL" property="price"/>
+        <result column="sale_count" jdbcType="INTEGER" property="ssaleCount"/>
+        <result column="comment_id" jdbcType="INTEGER" property="commentId"/>
+        <result column="stock" jdbcType="INTEGER" property="stock"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="category_id" jdbcType="INTEGER" property="categoryId"/>
+        <result column="category_child_id" jdbcType="INTEGER" property="categoryChildId"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="detail" jdbcType="VARCHAR" property="detail"/>
+        <result column="main_image" jdbcType="VARCHAR" property="mainImage"/>
+        <result column="create_time" jdbcType="DATE" property="createTime"/>
+        <result column="update_time" jdbcType="DATE" property="updateTime"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+     id, merchant_id, category_id, category_child_id, title, address, price, sale_count,
+      status, stock, main_image, detail, comment_id, create_time, update_time
+    </sql>
+    <insert id="insert">
+       insert into product (merchant_id, category_id, category_child_id,
+       title, address, price, sale_count, status, stock, main_image, detail, comment_id, create_time)
+        values ();
+
+  </insert>
+    <insert id="insertSelective"></insert>
+    <update id="setComment"></update>
+    <update id="updateByPrimaryKeySelective"></update>
+    <update id="updateByPrimaryKey"></update>
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM product WHERE id = #{id}
+    </delete>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM product WHERE id = #{id}
+    </select>
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM product
+    </select>
+    <select id="selectListOrderByRecommend" resultMap="BaseResultMap"></select>
+    <select id="selectByNameAndProductId" resultMap="BaseResultMap"></select>
+    <select id="selectProductByCategoryId" resultMap="BaseResultMap"></select>
+    <select id="selectProductByRecommend" resultMap="BaseResultMap"></select>
+    <select id="checkProductCount" resultType="java.lang.Integer">
+        SELECT count(1) FROM product WHERE id = #{id}
+    </select>
+    <select id="selectProductByMerchantId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM product WHERE merchant_id = #{merchantId}
+    </select>
+    <select id="selectListByMerchantId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM product WHERE merchant_id = #{merchantId}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjh.online.restaurant.mapper.UserMapper">
+    <insert id="insert">
+        insert into user ( username,tel, password, email,role, create_time) values (#{username},#{tel},#{password},#{email},#{role},now());
+    </insert>
+    <insert id="register">
+        insert into user ( username,tel, password, email,role, create_time) values (#{username},#{tel},#{password},#{email},#{role},now());
+    </insert>
+    <update id="update">
+        UPDATE user SET username = #{username},password = #{password},email = #{email},update_time = now() where tel = #{tel} and  role = 0
+    </update>
+    <update id="updateByAdmin">
+        UPDATE user SET username = #{username},password = #{password},email = #{email},update_time = now() where tel = #{tel}
+    </update>
+    <update id="updateRole">
+        UPDATE user SET role = #{role} , update_time = now() where tel = #{tel}
+    </update>
+    <delete id="delete"></delete>
+    <delete id="deleteById">
+        DELETE  FROM user WHERE id = #{id}
+    </delete>
+    <delete id="deleteAdminById">
+         DELETE  FROM user WHERE id = #{id} and role = 0
+    </delete>
+
+    <select id="selectAll" resultType="com.cjh.online.restaurant.entity.User">
+        SELECT id,tel,username,email,status,role,create_time,update_time FROM user
+    </select>
+    <select id="selectById" resultType="com.cjh.online.restaurant.entity.User">
+                SELECT id,tel,password,username,email,status,role,create_time,update_time FROM user WHERE  id = #{id}
+    </select>
+    <select id="selectByTel" resultType="com.cjh.online.restaurant.entity.User">
+        SELECT id,tel,password,username,email,status,role,create_time,update_time FROM user WHERE  tel = #{tel}
+    </select>
+
+    <select id="checkUser" resultType="java.lang.Integer">
+        SELECT count(1) FROM user
+        WHERE tel = #{tel}
+    </select>
+    <select id="selectLogin" parameterType="map" resultType="com.cjh.online.restaurant.entity.User">
+        SELECT id,tel,username,email,status,role FROM user
+        WHERE tel = #{tel} and password = #{password}
+
+    </select>
+    <select id="checkEmail" resultType="java.lang.Integer">
+        SELECT count(1) FROM user
+        WHERE email = #{email}
+    </select>
+    <select id="checkUsername" resultType="java.lang.Integer">
+        SELECT count(1) FROM user
+        WHERE username = #{username}
+    </select>
+    <select id="selectQuestion" parameterType="String" resultType="java.lang.String">
+        SELECT question FROM user
+        WHERE tel = #{tel}
+    </select>
+    <select id="checkAnswer" parameterType="map" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM user
+        WHERE tel = #{tel}
+        and question = #{question}
+        and answer = #{answer}
+    </select>
+    <select id="checkPassword" resultType="java.lang.Integer">
+        SELECT count(1) FROM user WHERE tel = #{tel}
+        and password = #{password}
+    </select>
+    <select id="checkEmailByTel" resultType="java.lang.Integer">
+        SELECT count(1) FROM user
+        WHERE tel != #{tel}
+        and email = #{email}
+    </select>
+    <select id="selectAllManage" resultType="com.cjh.online.restaurant.entity.User">
+         SELECT id,tel,username,email,status,role,create_time,update_time FROM user WHERE role = 1 OR role = 2
+    </select>
+    <select id="selectManage" resultType="com.cjh.online.restaurant.entity.User">
+        SELECT id,tel,username,email,status,role,create_time,update_time FROM user WHERE role = 1
+    </select>
+    <select id="selectAllUser" resultType="com.cjh.online.restaurant.entity.User">
+        SELECT id,tel,username,email,status,role,create_time,update_time FROM user WHERE role = 0
+    </select>
+    <select id="checkUserByFore" resultType="java.lang.Integer">
+         SELECT count(1) FROM user
+        WHERE tel != #{tel}
+        and role = 0
+    </select>
+
+    <update id="updatePasswordByTel">
+      UPDATE user
+      SELECT password = #{passwordnew},update_time = now()
+      where tel = #{tel}
+    </update>
+    <update id="updateInform">
+        UPDATE user SET
+        email = #{email},
+        question = #{question},
+        answer = #{answer}
+        where tel = #{tel}
+    </update>
+
+
+</mapper>

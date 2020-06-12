@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <script src="js/jquery-3.3.1.js"></script>
+    <link rel="stylesheet" href="layui/css/layui.css">
+    <script src="layui/layui.js"></script>
+</head>
+
+<body>
+
+<div id="treeData" class="demo-tree demo-tree-box" style="width: 100%; height: 100%;"></div>
+
+<style type="text/css">
+
+</style>
+<script>
+    var treeData;
+    $.ajax({
+        url:"/manage/categroy/get_all_product_category",
+        type:"get",
+        dataType:"json",
+        success:function (data) {
+            treeData = data;
+        }
+    })
+    layui.use(['form','tree','layer'], function () {
+        var form = layui.form;
+        var  tree = layui.tree;
+        var layer = layui.layer;
+        tree.render({
+            elem: '#treeData'
+            ,id:"parentId"
+            ,spread:true
+            , data: treeData.data
+            , edit: ['add', 'update', 'del'] //操作节点的图标
+            , click: function (obj) {
+                layer.msg(JSON.stringify(obj.data));
+            }
+            ,operate: function(obj){
+                var type = obj.type; //得到操作类型：add、edit、del
+                var data = obj.data; //得到当前节点的数据
+                var elem = obj.elem; //得到当前节点元素
+
+                //Ajax 操作
+                var id = data.id; //得到节点索引
+                if(type === 'add'){ //增加节点
+                    //返回 key 值
+                    $.ajax({
+                        url:"/manage/categroy/add_category",
+                        type:"get",
+                        data:{
+                            "categoryName":"未命名",
+                            "parentId":obj.data.id
+                        },
+                        success:function (data) {
+                            if(data.msg ==="添加品类成功"){
+                                layer.msg(data.msg, {icon: 6});
+                            }else {
+                                layer.msg(data.msg, {icon: 5});
+                            }
+                        }
+                    })
+                    return ;
+                } else if(type === 'update'){ //修改节点
+                    $.ajax({
+                        url:"/manage/categroy/set_category_name",
+                        type:"get",
+                        data:{
+                            "categoryId":obj.data.id,
+                            "categoryName":elem.find('.layui-tree-txt').html()
+                        },
+                        success:function (data) {
+                            if(data.msg==="更新品类名字成功"){
+                                layer.msg(data.msg, {icon: 6});
+                            }else {
+                                layer.msg(data.msg, {icon: 5});
+                            }
+                        }
+                    })
+                    console.log(elem.find('.layui-tree-txt').html()); //得到修改后的内容
+                } else if(type === 'del'){ //删除节点
+                    $.ajax({
+                        url:"/manage/categroy/delete_category",
+                        type:"get",
+                        data:{
+                            "id":obj.data.id
+                        },
+                        success:function (data) {
+                            if (data.msg === "删除品类成功"){
+                                layer.msg(data.msg, {icon: 6});
+                            }else {
+                                layer.msg(data.msg, {icon: 5});
+                            }
+                        }
+                    })
+                };
+            }
+        });
+    });
+
+
+    /*用户-删除*/
+    function member_del(obj, id) {
+        layer.confirm('确认要删除吗？', function (index) {
+            //发异步删除数据
+            $(obj).parents("tr").remove();
+            layer.msg('已删除!', {icon: 1, time: 1000});
+        });
+    }
+
+
+    function delAll(argument) {
+
+        var data = tableCheck.getData();
+
+        layer.confirm('确认要删除吗？' + data, function (index) {
+            //捉到所有被选中的，发异步进行删除
+            layer.msg('删除成功', {icon: 1});
+            $(".layui-form-checked").not('.header').parents('tr').remove();
+        });
+    }
+</script>
+</body>
+
+</html>

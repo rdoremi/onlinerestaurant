@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <!--<link rel="stylesheet" href="//res.layui.com/layui/dist/css/layui.css"  media="all">-->
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <script src="js/jquery-3.3.1.js"></script>
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+
+<table class="layui-hide" id="user" lay-filter="test"></table>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm layui-icon" lay-event="adduser">&#xe654;添加</button>
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+
+<!--<script src="//res.layui.com/layui/dist/layui.js" charset="utf-8"></script>-->
+<script src="layui/layui.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+
+<script type="text/javascript" th:inline="none">
+    layui.use(['table', 'element', 'layer', 'jquery', 'form'], function () {
+        //var $ = layui.jquery
+        var element = layui.element
+        var layer = layui.layer
+        var form = layui.form;
+        var table = layui.table;
+        var tableIns = table.render({
+            elem: '#user'
+            , url: 'manage/user/get_user_list'
+            , limits: [10, 20, 30, 40, 50, 60, 70, 80, 90]
+
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            , defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                , layEvent: 'LAYTABLE_TIPS'
+                , icon: 'layui-icon-tips'
+            }]
+            , title: '用户数据表'
+            , totalRow: true
+            , page: true
+            , cols: [ [
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: '序号', width: "5%", fixed: 'left', unresize: true, sort: true, type: "numbers"}
+                , {field: 'tel', title: '电话', width: "10%"}
+                , {field: 'username', title: '用户名', width: "10%"}
+                , {field: 'email', title: '邮箱', width: "15%"}
+                , {field: 'status', title: '状态', width: "5%", sort: true}
+                , {field: 'role', title: '角色', width: "10%"}
+                , {field: 'create_time', title: '创建时间', width: "15%", sort: true}
+                , {field: 'update_time', title: '更新时间', width: "15%", sort: true}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo'}
+            ] ]
+
+            /*,response: {
+                statusCode: 200 //重新规定成功的状态码为 200，table 组件默认为 0
+            }*/
+            , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+
+                return {
+                    "code": 0, //解析接口状态
+                    "msg": "数据显示", //解析提示文本
+                    "count": res.data.total, //解析数据长度
+                    "data": res.data.list //解析数据列表
+                };
+            }
+        });
+        //头工具栏事件
+        table.on('toolbar(test)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+
+                //自定义头工具栏右侧图标 - 提示
+                case 'LAYTABLE_TIPS':
+                    layer.alert('这是工具栏右侧自定义的一个图标按钮');
+                    break;
+                case 'adduser':
+                    layer.open({
+                        type: 1,
+                        title: "新增用户",
+                        area: ['500px', '500px'],
+
+                        content: " <form class=\"layui-form\" id='adduser' style='margin-top: 50px'>\n" +
+                        "        <div class=\"layui-form-item\">\n" +
+                        "            <label class=\"layui-form-label\">用户名</label>\n" +
+                        "            <div class=\"layui-input-block\">\n" +
+                        "                <input type=\"text\" id='admin_username' name=\"username\" lay-verify=\"username\" style=\"width: 300px;\" autocomplete=\"off\"\n" +
+                        "                       placeholder=\"请输入用户名\"\n" +
+                        "                       class=\"layui-input\">\n" +
+                        "            </div>\n" +
+                        "        </div>\n" +
+                        "        <div class=\"layui-form-item\">\n" +
+                        "            <label class=\"layui-form-label\">电话</label>\n" +
+                        "            <div class=\"layui-input-block\">\n" +
+                        "                <input type=\"text\" id='admin_tel' name=\"tel\" lay-verify=\"tel\" style=\"width: 300px;\" autocomplete=\"off\"\n" +
+                        "                       placeholder=\"请输入电话\"\n" +
+                        "                       class=\"layui-input\">\n" +
+                        "            </div>\n" +
+                        "        </div>\n" +
+                        "        <div class=\"layui-form-item\">\n" +
+                        "            <label class=\"layui-form-label\">密码</label>\n" +
+                        "            <div class=\"layui-input-block\">\n" +
+                        "                <input type=\"text\" id='admin_password' name=\"password\" lay-verify=\"password\" style=\"width: 300px;\" autocomplete=\"off\"\n" +
+                        "                       placeholder=\"请输入密码\"\n" +
+                        "                       class=\"layui-input\">\n" +
+                        "            </div>\n" +
+                        "        </div>\n" +
+                        "        <div class=\"layui-form-item\">\n" +
+                        "            <label class=\"layui-form-label\">邮箱</label>\n" +
+                        "            <div class=\"layui-input-block\">\n" +
+                        "                <input type=\"text\" id='admin_email' name=\"email\" lay-verify=\"email\" style=\"width: 300px;\" autocomplete=\"off\"\n" +
+                        "                       placeholder=\"请输入邮箱\"\n" +
+                        "                       class=\"layui-input\">\n" +
+                        "            </div>\n" +
+                        "        </div>\n" +
+                        "        <div class=\"layui-form-item\">\n" +
+                        "            <label class=\"layui-form-label\">角色</label>\n" +
+                        "            <div class=\"layui-input-block\">\n" +
+                        "                <input type=\"text\"  lay-verify=\"role\" style=\"width: 300px;\" autocomplete=\"off\"\n" +
+                        "                       placeholder=\"管理员\" value='普通用户' \n" +
+                        "                       class=\"layui-input\" readonly='readonly'>\n" +
+                        "            </div>\n" +
+                        "        </div>\n" +
+                        "    </form>"
+                        , btn: ['确定', '取消'],
+                        yes: function (index, layero) {
+                            var username = $("#admin_username").val();
+                            var password = $("#admin_password").val();
+                            var tel = $("#admin_tel").val();
+                            var email = $("#admin_email").val();
+                            $.ajax({
+                                url: "/manage/user/add_user",
+                                type: "post",
+                                data: {
+                                    "username": username,
+                                    "password": password,
+                                    "tel": tel,
+                                    "email": email
+                                },
+                                success: function (data) {
+                                    if (data.msg === "SUCCESS") {
+                                        layer.msg(data.msg, {icon: 6});
+                                        layer.close(index)
+                                        tableIns.reload()
+                                    } else {
+                                        layer.msg(data.msg, {icon: 5});
+                                    }
+
+                                }
+
+                            })
+                        },
+                        btn1: function (index, layero) {
+                            layer.close(index)
+                        },
+                    });
+                    break;
+            }
+            ;
+        });
+
+        //监听行工具事件
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+            //console.log(obj)
+            if (obj.event === 'del') {
+                layer.confirm('真的删除行么', function (index) {
+
+                    $.ajax({
+                        url: "/manage/user/delete_user?id=" + obj.data.id,
+                        type: "get",
+                        success: function (data) {
+                            console.log(data)
+                            if (data.msg === "SUCCESS") {
+                                layer.msg(data.msg, {icon: 6});
+                                obj.del();
+                                layer.close(index);
+                            } else {
+                                layer.msg(data.msg, {icon: 5});
+                            }
+
+                        }
+                    })
+
+                });
+            } else if (obj.event === 'edit') {
+
+                layer.open({
+                    type: 1,
+                    title: "修改用户信息",
+                    area: ['500px', '500px'],
+
+                    content: " <form class=\"layui-form\" id='adduser' style='margin-top: 50px'>\n" +
+                    "        <div class=\"layui-form-item\">\n" +
+                    "            <label class=\"layui-form-label\">用户名</label>\n" +
+                    "            <div class=\"layui-input-block\">\n" +
+                    "                <input type=\"text\" id='update_admin_username' value='" + obj.data.username + "' name=\"username\" lay-verify=\"username\" style=\"width: 300px;\" autocomplete=\"off\"\n" +
+                    "                       placeholder=\"请输入用户名\"\n" +
+                    "                       class=\"layui-input\">\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "        <div class=\"layui-form-item\">\n" +
+                    "            <label class=\"layui-form-label\">电话</label>\n" +
+                    "            <div class=\"layui-input-block\">\n" +
+                    "                <input type=\"text\" id='update_admin_tel' value='" + obj.data.tel + "' name=\"tel\" lay-verify=\"tel\" style=\"width: 300px;\" autocomplete=\"off\"\n" +
+                    "                       placeholder=\"请输入电话\"\n" +
+                    "                       class=\"layui-input\" readonly='readonly'>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "        <div class=\"layui-form-item\">\n" +
+                    "            <label class=\"layui-form-label\">密码</label>\n" +
+                    "            <div class=\"layui-input-block\">\n" +
+                    "                <input type=\"text\" id='update_admin_password'  name=\"password\" lay-verify=\"password\" style=\"width: 300px;\" autocomplete=\"off\"\n" +
+                    "                       placeholder=\"请输入密码\"\n" +
+                    "                       class=\"layui-input\">\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "        <div class=\"layui-form-item\">\n" +
+                    "            <label class=\"layui-form-label\">邮箱</label>\n" +
+                    "            <div class=\"layui-input-block\">\n" +
+                    "                <input type=\"text\" id='update_admin_email' value='" + obj.data.email + "' name=\"email\" lay-verify=\"email\" style=\"width: 300px;\" autocomplete=\"off\"\n" +
+                    "                       placeholder=\"请输入邮箱\"\n" +
+                    "                       class=\"layui-input\">\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "        <div class=\"layui-form-item\">\n" +
+                    "            <label class=\"layui-form-label\">角色</label>\n" +
+                    "            <div class=\"layui-input-block\">\n" +
+                    "                <input type=\"text\"  lay-verify=\"role\" style=\"width: 300px;\" autocomplete=\"off\"\n" +
+                    "                       placeholder=\"管理员\" value='普通用户' \n" +
+                    "                       class=\"layui-input\" readonly='readonly'>\n" +
+                    "            </div>\n" +
+                    "        </div>\n" +
+                    "    </form>"
+                    , btn: ['确定', '取消'],
+                    yes: function (index, layero) {
+                        var username = $("#update_admin_username").val();
+                        var password = $("#update_admin_password").val();
+                        var tel = $("#update_admin_tel").val()
+                        var email = $("#update_admin_email").val();
+                        $.ajax({
+                            url: "/manage/user/update_user",
+                            type: "post",
+                            data: {
+                                "username": username,
+                                "tel": tel,
+                                "password": password,
+                                "email": email
+                            },
+                            success: function (data) {
+                                if (data.msg === "SUCCESS") {
+                                    layer.msg(data.msg, {icon: 6});
+                                    layer.close(index)
+                                    tableIns.reload()
+                                } else {
+                                    layer.msg(data.msg, {icon: 5});
+                                }
+
+                            }
+
+                        })
+                    },
+                    btn1: function (index, layero) {
+                        layer.close(index)
+                    },
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

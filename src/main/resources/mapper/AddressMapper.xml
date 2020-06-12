@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjh.online.restaurant.mapper.AddressMapper">
+    <sql id="Base_Column_List">
+        id,userId,receiver,area,detail,`type`,tel,postalcode,createTime,updateTime
+    </sql>
+    <insert id="insert">
+    insert into address ( userId, receiver, area, detail, tel, postalcode, createTime) values (
+    #{userId},#{receiver},#{area},#{detail},#{tel},#{postalcode},now()
+    );
+    </insert>
+    <update id="update">
+        UPDATE address SET receiver=#{receiver},area = #{area},detail = #{detail},type=#{type},
+        tel=#{tel},postalcode = #{postalcode},updateTime = now() where userId = #{userId}
+    </update>
+    <delete id="deleteById">
+        DELETE FROM address WHERE id = #{id}
+    </delete>
+    <select id="selectAddressByUserId" resultType="com.cjh.online.restaurant.entity.Address">
+        SELECT <include refid="Base_Column_List"/>
+        FROM address WHERE userId = #{userId}
+    </select>
+    <select id="selectAddressById" resultType="com.cjh.online.restaurant.entity.Address">
+        SELECT <include refid="Base_Column_List"/>
+        FROM address WHERE id = #{id}
+    </select>
+
+</mapper>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <!--<link rel="stylesheet" href="//res.layui.com/layui/dist/css/layui.css"  media="all">-->
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <script src="js/jquery-3.3.1.js"></script>
+    <style>
+        img {
+            width: 250px;
+            height: 250px;
+        }
+    </style>
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+
+<table class="layui-hide" id="shop-list" lay-filter="test"></table>
+
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm layui-icon" id="add_product" lay-event="add_product">&#xe654;添加</button>
+
+    </div>
+</script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="product_message">详情</a>
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<!--<script src="//res.layui.com/layui/dist/layui.js" charset="utf-8"></script>-->
+<script src="layui/layui.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+
+<script type="text/javascript" th:inline="none">
+
+    layui.use(['table', 'element', 'layer', 'jquery', 'form', 'upload'], function () {
+        //var $ = layui.jquery
+        var element = layui.element
+        var layer = layui.layer
+        var form = layui.form;
+        var table = layui.table;
+        var upload = layui.upload
+        var tableIns = table.render({
+            elem: '#shop-list'
+            , url: 'manage/shop/get_shop_list'
+            , limits: [10, 20, 30, 40, 50, 60, 70, 80, 90]
+           /* , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板*/
+            , defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+                title: '提示'
+                , layEvent: 'LAYTABLE_TIPS'
+                , icon: 'layui-icon-tips'
+            }]
+            , title: '店铺'
+            , totalRow: true
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: '序号', width: "5%", fixed: 'left', unresize: true, sort: true, type: "numbers"}
+                // ,{field:"mainImage",title:"图片",width:"5%",templet:"<div><img style='width: 50px;height: 50px' src='/admin/file/file_download?path=/{{d.mainImage}}'/></div>"}
+                , {field: 'merchantId', title: '店铺编号', width: "20%"}
+                , {field: 'shopName', title: '店铺名称', width: "10%"}
+                , {field: 'address', title: '地址', width: "10%"}
+                , {field: 'shopManager', title: '负责人', width: "10%", sort: true}
+                , {field: 'tel', title: '电话', width: "10%", sort: true}
+                , {field: 'email', title: '邮箱', width: "8%", sort: true}
+                , {field: 'createTime', title: '入住时间', width: "5%"}
+                , {fixed: 'right', title: '操作', toolbar: '#barDemo'}
+            ]]
+            , page: true
+            /*,response: {
+                statusCode: 200 //重新规定成功的状态码为 200，table 组件默认为 0
+            }*/
+            , parseData: function (res) { //将原始数据解析成 table 组件所规定的数据
+
+                return {
+                    "code": 0, //解析接口状态
+                    "msg": "数据显示", //解析提示文本
+                    "count": res.data.total, //解析数据长度
+                    "data": res.data.list //解析数据列表
+                };
+            }
+        });
+        //头工具栏事件
+        table.on('toolbar(test)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+
+                case 'add_product':
+                    layer.open({
+                        type: 2,
+                        title: "新增商品",
+                        area: ['1200px', '900px'],
+                        maxmin: true,
+                        content: ""
+                        , btn: ['确定', '取消'],
+                        yes: function (index, layero) {
+
+                        },
+                        btn1: function (index, layero) {
+                            $("input").val("")
+
+                            layer.close(index)
+                        },
+                        success: function () {
+                            tableIns.reload();
+                            form.render("select");
+                        }
+                    });
+                    break;
+                //自定义头工具栏右侧图标 - 提示
+                case 'LAYTABLE_TIPS':
+                    layer.alert('这是工具栏右侧自定义的一个图标按钮');
+                    break;
+            }
+            ;
+
+
+
+        });
+
+
+        //监听行工具事件
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+
+            if (obj.event === 'del') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        url:"/manage/shop/delete_shop?id="+obj.data.id,
+                        type:"get",
+                        success:function (data) {
+                            if(data.msg === "SUCCESS"){
+                                layer.msg(data.msg, {icon: 6});
+                                tableIns.reload()
+                            }else {
+                                layer.msg(data.msg, {icon: 5});
+                                tableIns.reload()
+                            }
+                        }
+                    })
+                });
+            } else if (obj.event === 'edit') {
+                layer.open({
+                    type: 1,
+                    title: "修改店铺信息",
+                    area: ['500px', '500px'],
+
+                    content: ""
+                    , btn: ['确定', '取消'],
+                    yes: function (index, layero) {
+                        tableIns.reload()
+                    },
+                    btn1: function (index, layero) {
+                        layer.close(index)
+                        tableIns.reload()
+                    },
+                });
+            } else if (obj.event === 'product_message') {
+                layer.open({
+                    type: 2,
+                    title: "商品详情",
+                    area: ['1200px', '900px'],
+                    maxmin: true,
+                    content: "/product_details?id="+obj.data.id
+
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

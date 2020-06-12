@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cjh.online.restaurant.mapper.CartMapper">
+    <resultMap id="BaseResultMap" type="com.cjh.online.restaurant.entity.Cart">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="product_id" jdbcType="INTEGER" property="productId"/>
+        <result column="create_time" jdbcType="INTEGER" property="createTime"/>
+        <result column="update_time" jdbcType="INTEGER" property="updateTime"/>
+
+    </resultMap>
+    <sql id="Base_Column_List">
+        id,user_id,product_id,quantity,create_time,update_time
+    </sql>
+    <insert id="insert">
+       insert into cart (user_id, product_id, quantity, create_time) values (
+           #{userId},#{productId},#{quantity}, now()
+        );
+    </insert>
+    <insert id="insertSelective">
+         insert into cart (user_id, product_id, quantity, create_time) values (
+           #{userId},#{productId},#{quantity}, now()
+        );
+    </insert>
+    <update id="updateByPrimaryKeySelective"></update>
+    <update id="updateByPrimaryKey"></update>
+    <update id="updateCount"></update>
+    <update id="updateQuantity">
+        UPDATE cart SET quantity = #{quantity},update_time = now() WHERE user_id = #{userId} and product_id =#{productId}
+    </update>
+
+    <update id="updateCartQuantity">
+        UPDATE cart SET quantity = #{quantity},update_time = now() WHERE user_id = #{userId} and id =#{id}
+    </update>
+    <delete id="deleteByPrimaryKey">
+        DELETE FROM cart WHERE id = #{id}
+    </delete>
+    <delete id="deleteByUserIdProductIds"></delete>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM cart WHERE id = #{id}
+    </select>
+    <select id="selectCartByUserIdProductId" resultMap="BaseResultMap"></select>
+    <select id="selectCartByUserIdProductIdColor" resultMap="BaseResultMap"></select>
+    <select id="selectCartByUserId" resultMap="BaseResultMap"></select>
+    <select id="selectCartProductCheckedStatusByUserId" resultType="java.lang.Integer"></select>
+    <select id="checkedOrUncheckedProduct" resultType="java.lang.Integer"></select>
+    <select id="selectCartProductCount" resultType="java.lang.Integer"></select>
+    <select id="selectCheckedCartByUserId" resultMap="BaseResultMap"></select>
+    <select id="selectCheckedCartByUserTel" resultMap="BaseResultMap"></select>
+    <select id="selectAllCartByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM cart WHERE user_id = #{userId}
+    </select>
+    <select id="checkCart" resultMap="BaseResultMap">
+        SELECT quantity FROM cart WHERE product_id = #{productId}
+    </select>
+</mapper>
